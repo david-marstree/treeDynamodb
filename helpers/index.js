@@ -183,8 +183,15 @@ const getValue = (AttributeValue) => {
       return getValue(AttributeValue.M);
     } else if (keys[0] === "L") {
       return _.map(AttributeValue.L, (v) => getValue(v));
-    } else if (keys[0]) {
-      return AttributeValue;
+    } else if (
+      _.isPlainObject(AttributeValue[keys[0]]) ||
+      _.isArray(AttributeValue[keys[0]])
+    ) {
+      let obj = {};
+      obj[keys[0]] = getValue(AttributeValue[keys[0]]);
+      return obj;
+    } else {
+      return AttributeValue[keys[0]];
     }
   }
 

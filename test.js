@@ -7,12 +7,12 @@ const client = treeDynamodb.createClient({
 const func = async () => {
   const response = await treeDynamodb.get({
     client,
-    table: "marstreeV4Company-dev",
+    table: "apiflowProject-dev",
     query: {
       limit: 10,
     },
   });
-  console.log(JSON.stringify(response, null, 2));
+  console.log(response.Items);
 };
 
 func();
