@@ -52,8 +52,8 @@ const get = async ({ client, table, query }) => {
 
   try {
     let response = await client.send(cmd);
-    // response.Items = helper.getValue(response.Items);
-    // response.LastEvaluatedKey = helper.getValue(response.LastEvaluatedKey);
+    response.Items = helper.getValue(response.Items);
+    response.LastEvaluatedKey = helper.getValue(response.LastEvaluatedKey);
     return response;
   } catch (error) {
     console.log(error);

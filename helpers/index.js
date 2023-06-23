@@ -83,7 +83,7 @@ const getAttributeValue = (value) => {
  * @param {*} attributeValue
  * @returns
  */
-const getValue = (attributeValue) => {
+const getValueBak = (attributeValue) => {
   if (!_.isPlainObject(attributeValue) && !_.isArray(attributeValue)) {
     if (dataType(attributeValue) === "N") {
       return +attributeValue;
@@ -138,6 +138,57 @@ const getValue = (attributeValue) => {
       []
     );
   }
+};
+
+const getValue = (AttributeValue) => {
+  // check attributeValue is object
+  if (_.isArray(AttributeValue)) {
+    return _.reduce(
+      AttributeValue,
+      (prev, attrV) => {
+        prev.push(getValue(attrV));
+        return prev;
+      },
+      []
+    );
+  }
+
+  // check attributeValue is object
+  if (_.isPlainObject(AttributeValue)) {
+    const keys = _.keys(AttributeValue);
+    if (keys.length > 1) {
+      return _.reduce(
+        AttributeValue,
+        (prev, attrV, key) => {
+          prev[key] = getValue(attrV);
+          return prev;
+        },
+        {}
+      );
+    }
+
+    if (keys[0] === "S") {
+      return AttributeValue.S + "";
+    } else if (keys[0] === "N") {
+      return +AttributeValue.N;
+    } else if (keys[0] === "B" || keys[0] === "BOOL") {
+      return AttributeValue[keys[0]];
+    } else if (keys[0] === "NULL") {
+      return !!AttributeValue.NULL ? null : "1";
+    } else if (keys[0] === "BS" || keys[0] === "SS") {
+      return AttributeValue[keys[0]];
+    } else if (keys[0] === "NS") {
+      return _.map(AttributeValue.NS, (v) => +v);
+    } else if (keys[0] === "M") {
+      return getValue(AttributeValue.M);
+    } else if (keys[0] === "L") {
+      return _.map(AttributeValue.L, (v) => getValue(v));
+    } else if (keys[0]) {
+      return AttributeValue;
+    }
+  }
+
+  return AttributeValue;
 };
 
 /**
