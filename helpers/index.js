@@ -83,62 +83,62 @@ const getAttributeValue = (value) => {
  * @param {*} attributeValue
  * @returns
  */
-const getValueBak = (attributeValue) => {
-  if (!_.isPlainObject(attributeValue) && !_.isArray(attributeValue)) {
-    if (dataType(attributeValue) === "N") {
-      return +attributeValue;
-    }
-    if (dataType(attributeValue) === "NULL") {
-      return null;
-    }
-    return attributeValue;
-  }
+// const getValueBak = (attributeValue) => {
+//   if (!_.isPlainObject(attributeValue) && !_.isArray(attributeValue)) {
+//     if (dataType(attributeValue) === "N") {
+//       return +attributeValue;
+//     }
+//     if (dataType(attributeValue) === "NULL") {
+//       return null;
+//     }
+//     return attributeValue;
+//   }
 
-  // check attributeValue is object
-  if (_.isPlainObject(attributeValue)) {
-    if (_.keys(attributeValue).length > 1) {
-      // check attributeValue's key > 1
-      return _.reduce(
-        attributeValue,
-        (prev, attrV, attrKey) => {
-          prev[attrKey] = getValue(attrV);
-          return prev;
-        },
-        {}
-      );
-    } else if (_.keys(attributeValue).length == 1) {
-      // check attributeValue's key == 1
-      let key = _.keys(attributeValue)[0];
-      if (
-        _.includes(
-          ["B", "BOOL", "BS", "L", "M", "N", "NS", "NULL", "S", "SS"],
-          key
-        )
-      ) {
-        return getValue(attributeValue[key]);
-      } else {
-        if (
-          _.isPlainObject(attributeValue[key]) ||
-          _.isArray(attributeValue[key])
-        ) {
-          attributeValue[key] = getValue(attributeValue[key]);
-        }
-        return attributeValue;
-      }
-    }
-  }
-  // check attributeValue is array
-  if (_.isArray(attributeValue)) {
-    return _.reduce(
-      attributeValue,
-      (prev, attrV) => {
-        prev.push(getValue(attrV));
-        return prev;
-      },
-      []
-    );
-  }
-};
+//   // check attributeValue is object
+//   if (_.isPlainObject(attributeValue)) {
+//     if (_.keys(attributeValue).length > 1) {
+//       // check attributeValue's key > 1
+//       return _.reduce(
+//         attributeValue,
+//         (prev, attrV, attrKey) => {
+//           prev[attrKey] = getValue(attrV);
+//           return prev;
+//         },
+//         {}
+//       );
+//     } else if (_.keys(attributeValue).length == 1) {
+//       // check attributeValue's key == 1
+//       let key = _.keys(attributeValue)[0];
+//       if (
+//         _.includes(
+//           ["B", "BOOL", "BS", "L", "M", "N", "NS", "NULL", "S", "SS"],
+//           key
+//         )
+//       ) {
+//         return getValue(attributeValue[key]);
+//       } else {
+//         if (
+//           _.isPlainObject(attributeValue[key]) ||
+//           _.isArray(attributeValue[key])
+//         ) {
+//           attributeValue[key] = getValue(attributeValue[key]);
+//         }
+//         return attributeValue;
+//       }
+//     }
+//   }
+//   // check attributeValue is array
+//   if (_.isArray(attributeValue)) {
+//     return _.reduce(
+//       attributeValue,
+//       (prev, attrV) => {
+//         prev.push(getValue(attrV));
+//         return prev;
+//       },
+//       []
+//     );
+//   }
+// };
 
 const getValue = (AttributeValue) => {
   // check attributeValue is object
