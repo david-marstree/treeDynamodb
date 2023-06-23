@@ -9,10 +9,10 @@ const func = async () => {
     client,
     table: "apiflowProject-dev",
     query: {
-      limit: 10,
+      limit: "10",
     },
   });
-  console.log(response.Items);
+  console.log(response);
 };
 
 func();

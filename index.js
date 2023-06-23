@@ -51,6 +51,7 @@ const describeTable = async ({ client, table }) => {
 const get = async ({ client, table, query }) => {
   const Table = await describeTable({ client, table });
   const partiQL = helper.createPartiQL({ Table, query });
+  console.log("partiQL", partiQL);
   const cmd = new ExecuteStatementCommand(partiQL);
 
   try {

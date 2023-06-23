@@ -4,7 +4,7 @@
         "lodash": "^4.17.21"
     },
     "name": "treedynamodb",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "for tree system to call aws dynamodb ",
     "main": "index.js",
     "devdependencies": {},

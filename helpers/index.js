@@ -317,7 +317,7 @@ const createPartiQL = ({ Table, query = {} }) => {
     Statement: `SELECT * FROM "${Table.TableName}" `,
   };
   const { limit, ...option } = query;
-  if (!!limit) partiQL["Limit"] = limit;
+  if (!!limit) partiQL["Limit"] = +limit;
 
   // check option is empty or not
   if (_.isEmpty(option)) return partiQL;
