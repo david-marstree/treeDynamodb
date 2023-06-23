@@ -1,6 +1,28 @@
 {
-  "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.282.0",
-    "lodash": "^4.17.21"
-  }
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.282.0",
+        "lodash": "^4.17.21"
+    },
+    "name": "treedynamodb",
+    "version": "1.0.1",
+    "description": "for tree system to call aws Dynamodb ",
+    "main": "index.js",
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com/david-marstree/treeDynamodb.git"
+    },
+    "keywords": [
+        "aws",
+        "dynamodb"
+    ],
+    "author": "David MARStree",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/david-marstree/treeDynamodb/issues"
+    },
+    "homepage": "https://github.com/david-marstree/treeDynamodb#readme"
 }
