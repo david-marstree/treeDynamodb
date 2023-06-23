@@ -17,7 +17,10 @@ const helper = require("./helpers");
  * @param {*} config
  * @returns
  */
-const createClient = (config) => new DynamoDBClient(config);
+const createClient = (config) => {
+  const client = new DynamoDBClient(config);
+  return client;
+};
 
 /**
  * @name describeTable
