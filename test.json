@@ -1,7 +1,7 @@
 {
     "resource": "/project/{proxy+}",
-    "path": "/project/data",
-    "httpMethod": "POST",
+    "path": "/project/list",
+    "httpMethod": "GET",
     "headers": {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br",
@@ -130,7 +130,11 @@
             "https"
         ]
     },
-    "queryStringParameters": null,
+    "queryStringParameters": {
+        "enable": {
+            "ge": -1
+        }
+    },
     "multiValueQueryStringParameters": null,
     "pathParameters": {
         "proxy": "data"
@@ -166,6 +170,6 @@
         "domainName": "98mr41eomj.execute-api.ap-southeast-1.amazonaws.com",
         "apiId": "98mr41eomj"
     },
-    "body": "{\"name\":\"project2\",\"description\":\"project2 description\",\"user\":{\"sub\":\"f9da652c-5011-7087-3376-da19169d8b4e\",\"email_verified\":true,\"email\":\"davidaasm@gmail.com\"}}",
+    "body": "",
     "isBase64Encoded": false
 }
