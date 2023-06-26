@@ -38,6 +38,9 @@ const getAttributeValue = (value) => {
   if (!!dataType(value)) {
     // Basic data type
     obj[dataType(value)] = dataType(value) === "NULL" ? true : value;
+    if (dataType(value) === "N") {
+      obj[dataType(value)] = new String(value);
+    }
     return obj;
   }
 
@@ -208,7 +211,9 @@ const getValue = (AttributeValue) => {
 const createItem = ({ Table, data }) => {
   const dataNames = _.keys(data);
   const { KeySchema, AttributeDefinitions } = Table;
-  // check data keys include key or not
+  // // check data keys include key or not
+  // console.log("KeySchema", KeySchema);
+  // console.log("dataNames", dataNames);
   if (
     !_.some(
       KeySchema,

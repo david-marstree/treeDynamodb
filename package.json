@@ -4,7 +4,7 @@
         "lodash": "^4.17.21"
     },
     "name": "treedynamodb",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "for tree system to call aws dynamodb ",
     "main": "index.js",
     "devdependencies": {},
@@ -24,5 +24,8 @@
     "bugs": {
         "url": "https://github.com/david-marstree/treedynamodb/issues"
     },
-    "homepage": "https://github.com/david-marstree/treedynamodb#readme"
+    "homepage": "https://github.com/david-marstree/treedynamodb#readme",
+    "devDependencies": {
+        "treeapirequest": "^1.0.6"
+    }
 }
