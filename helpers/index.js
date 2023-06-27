@@ -324,9 +324,9 @@ const createPartiQL = ({ Table, query = {} }) => {
   let partiQL = {
     Statement: `SELECT * FROM "${Table.TableName}" `,
   };
-  const { limit, NextToken: nextToken, ...option } = query;
+  const { limit, offset, ...option } = query;
   if (!!limit) partiQL["Limit"] = +limit;
-  if (!!nextToken) partiQL["NextToken"] = nextToken;
+  if (!!offset) partiQL["NextToken"] = offset;
 
   // check option is empty or not
   if (_.isEmpty(option)) return partiQL;
