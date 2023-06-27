@@ -235,6 +235,9 @@ const createItem = ({ Table, data }) => {
       );
       if (af && af.AttributeType) {
         newObj[name] = {};
+        if (af.AttributeType === "N") {
+          data[name] = new String(data[name]);
+        }
         newObj[name][af.AttributeType] = data[name];
         return {
           ...prev,
