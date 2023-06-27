@@ -324,8 +324,9 @@ const createPartiQL = ({ Table, query = {} }) => {
   let partiQL = {
     Statement: `SELECT * FROM "${Table.TableName}" `,
   };
-  const { limit, ...option } = query;
+  const { limit, NextToken: nextToken, ...option } = query;
   if (!!limit) partiQL["Limit"] = +limit;
+  if (!!nextToken) partiQL["NextToken"] = nextToken;
 
   // check option is empty or not
   if (_.isEmpty(option)) return partiQL;
@@ -338,7 +339,7 @@ const createPartiQL = ({ Table, query = {} }) => {
   });
   partiQL["Statement"] += ` WHERE ${Statement}`;
   partiQL["Parameters"] = Parameters;
-
+  partiQL["ReturnConsumedCapacity"] = "TOTAL";
   return partiQL;
 };
 
