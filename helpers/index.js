@@ -290,7 +290,7 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
 
         Parameters.push(getAttributeValue(v));
       });
-    } else if (_.isArray(value)) {
+    } else if (_.isArray(value) && value.length > 0) {
       // check value is array
       Statement += ` ${key} IN (${_.map(value, () => "?").join(" , ")})`;
       Parameters = _.reduce(
@@ -301,7 +301,7 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
         },
         Parameters
       );
-    } else {
+    } else if (value) {
       Statement += ` ${key} = ?`;
       Parameters.push(getAttributeValue(value));
     }
