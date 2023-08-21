@@ -1,4 +1,9 @@
-const _ = require("lodash");
+import {
+  ExecuteStatementCommandInput,
+  TableDescription,
+  AttributeValue,
+} from "@aws-sdk/client-dynamodb";
+import _ from "lodash";
 
 /**
  * @name dataType
@@ -6,7 +11,14 @@ const _ = require("lodash");
  * @param {*} value
  * @returns
  */
-const dataType = (value) => {
+const dataType = (
+  value: null | string | number | boolean,
+): "NULL" | "BOOL" | "N" | "S" | false => {
+  if (_.isNull(value)) {
+    // NULL
+    return "NULL";
+  }
+
   if (typeof value === "boolean") {
     // Boolean
     return "BOOL";
@@ -20,10 +32,6 @@ const dataType = (value) => {
     // String
     return "S";
   }
-  if (_.isNull(value)) {
-    // NULL
-    return "NULL";
-  }
   return false;
 };
 
@@ -33,23 +41,41 @@ const dataType = (value) => {
  * @param {*} value
  * @returns
  */
-const getAttributeValue = (value) => {
-  let obj = {};
-  if (!!dataType(value)) {
+export type QueryDataType = "NULL" | "BOOL" | "N" | "S";
+
+export type QueryAttributeValue = {
+  NULL?: boolean;
+  BOOL?: boolean;
+  N?: string;
+  S?: string;
+  BS?: Uint8Array[];
+  B?: Uint8Array;
+  NS?: string[];
+  SS?: string[];
+  M?: QueryAttributeValue;
+  L?: (QueryAttributeValue | undefined)[];
+};
+
+export const getAttributeValue = (
+  value: any,
+): AttributeValue | QueryAttributeValue | undefined => {
+  let obj: QueryAttributeValue = {};
+  const dt = dataType(value);
+  if (dt !== false) {
     // Basic data type
-    obj[dataType(value)] = dataType(value) === "NULL" ? true : value;
-    if (dataType(value) === "N") {
-      obj[dataType(value)] = new String(value);
+    obj[dt] = dt === "NULL" ? true : value;
+    if (dt === "N") {
+      obj[dt] = new String(value) as string;
     }
     return obj;
   }
 
   if (_.isArray(value)) {
-    if (_.every(value, (v) => dataType(v) === "B")) {
-      //Binary Set
-      obj["BS"] = value;
-      return obj;
-    } else if (_.every(value, (v) => dataType(v) === "N")) {
+    //if (_.every(value, (v) => dataType(v) === "B")) {
+    //  //Binary Set
+    //  obj["BS"] = value;
+    //  return obj;
+    if (_.every(value, (v) => dataType(v) === "N")) {
       //number set
       obj["NS"] = value;
       return obj;
@@ -69,90 +95,47 @@ const getAttributeValue = (value) => {
     //map
     let newValue = _.reduce(
       value,
-      (prev, v, k) => {
+      (prev: any, v, k) => {
         prev[k] = getAttributeValue(v);
         return prev;
       },
-      {}
+      {},
     );
     obj["M"] = newValue;
     return obj;
   }
 };
 
-/**
- * @name getValue
- * @abstract get value by AWS dynamodb AttributeValue
- * @param {*} attributeValue
- * @returns
- */
-// const getValueBak = (attributeValue) => {
-//   if (!_.isPlainObject(attributeValue) && !_.isArray(attributeValue)) {
-//     if (dataType(attributeValue) === "N") {
-//       return +attributeValue;
-//     }
-//     if (dataType(attributeValue) === "NULL") {
-//       return null;
-//     }
-//     return attributeValue;
-//   }
+export type AttributeDataType =
+  | undefined
+  | null
+  | string
+  | number
+  | boolean
+  | Map
+  | List
+  | Blob
+  | Uint8Array
+  | Uint8Array[];
 
-//   // check attributeValue is object
-//   if (_.isPlainObject(attributeValue)) {
-//     if (_.keys(attributeValue).length > 1) {
-//       // check attributeValue's key > 1
-//       return _.reduce(
-//         attributeValue,
-//         (prev, attrV, attrKey) => {
-//           prev[attrKey] = getValue(attrV);
-//           return prev;
-//         },
-//         {}
-//       );
-//     } else if (_.keys(attributeValue).length == 1) {
-//       // check attributeValue's key == 1
-//       let key = _.keys(attributeValue)[0];
-//       if (
-//         _.includes(
-//           ["B", "BOOL", "BS", "L", "M", "N", "NS", "NULL", "S", "SS"],
-//           key
-//         )
-//       ) {
-//         return getValue(attributeValue[key]);
-//       } else {
-//         if (
-//           _.isPlainObject(attributeValue[key]) ||
-//           _.isArray(attributeValue[key])
-//         ) {
-//           attributeValue[key] = getValue(attributeValue[key]);
-//         }
-//         return attributeValue;
-//       }
-//     }
-//   }
-//   // check attributeValue is array
-//   if (_.isArray(attributeValue)) {
-//     return _.reduce(
-//       attributeValue,
-//       (prev, attrV) => {
-//         prev.push(getValue(attrV));
-//         return prev;
-//       },
-//       []
-//     );
-//   }
-// };
+type Map = {
+  [key: string]: AttributeDataType;
+};
 
-const getValue = (AttributeValue) => {
+type List = AttributeDataType[];
+
+export const getValue = (
+  AttributeValue: AttributeValue | any,
+): AttributeDataType | AttributeDataType[] | undefined => {
   // check attributeValue is object
   if (_.isArray(AttributeValue)) {
     return _.reduce(
       AttributeValue,
-      (prev, attrV) => {
+      (prev: List, attrV: AttributeValue) => {
         prev.push(getValue(attrV));
         return prev;
       },
-      []
+      [],
     );
   }
 
@@ -162,17 +145,17 @@ const getValue = (AttributeValue) => {
     if (keys.length > 1) {
       return _.reduce(
         AttributeValue,
-        (prev, attrV, key) => {
+        (prev: Map, attrV, key) => {
           prev[key] = getValue(attrV);
           return prev;
         },
-        {}
+        {},
       );
     }
 
     if (keys[0] === "S") {
       return AttributeValue.S + "";
-    } else if (keys[0] === "N") {
+    } else if (keys[0] === "N" && AttributeValue.N) {
       return +AttributeValue.N;
     } else if (keys[0] === "B" || keys[0] === "BOOL") {
       return AttributeValue[keys[0]];
@@ -182,7 +165,7 @@ const getValue = (AttributeValue) => {
       return AttributeValue[keys[0]];
     } else if (keys[0] === "NS") {
       return _.map(AttributeValue.NS, (v) => +v);
-    } else if (keys[0] === "M") {
+    } else if (keys[0] === "M" && AttributeValue.M) {
       return getValue(AttributeValue.M);
     } else if (keys[0] === "L") {
       return _.map(AttributeValue.L, (v) => getValue(v));
@@ -190,7 +173,7 @@ const getValue = (AttributeValue) => {
       _.isPlainObject(AttributeValue[keys[0]]) ||
       _.isArray(AttributeValue[keys[0]])
     ) {
-      let obj = {};
+      let obj: Map = {};
       obj[keys[0]] = getValue(AttributeValue[keys[0]]);
       return obj;
     } else {
@@ -208,7 +191,13 @@ const getValue = (AttributeValue) => {
  * @param {*} data
  * @returns
  */
-const createItem = ({ Table, data }) => {
+
+export type CreateItemProps = {
+  Table: TableDescription;
+  data: any;
+};
+
+export const createItem = ({ Table, data }: CreateItemProps) => {
   const dataNames = _.keys(data);
   const { KeySchema, AttributeDefinitions } = Table;
   // // check data keys include key or not
@@ -217,7 +206,7 @@ const createItem = ({ Table, data }) => {
   if (
     !_.some(
       KeySchema,
-      (k) => _.includes(dataNames, k.AttributeName) && k.KeyType === "HASH"
+      (k) => _.includes(dataNames, k.AttributeName) && k.KeyType === "HASH",
     )
   ) {
     console.log("KEY is not includes in data");
@@ -228,10 +217,10 @@ const createItem = ({ Table, data }) => {
   item = _.reduce(
     dataNames,
     (prev, name) => {
-      let newObj = {};
+      let newObj: any = {};
       const af = _.find(
         AttributeDefinitions,
-        (af) => af.AttributeName === name
+        (af) => af.AttributeName === name,
       );
       if (af && af.AttributeType) {
         newObj[name] = {};
@@ -251,13 +240,25 @@ const createItem = ({ Table, data }) => {
         };
       }
     },
-    item
+    item,
   );
 
   return item;
 };
 
-const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
+export type Query = {
+  [key: string]: any;
+};
+
+const _prepareParameters = ({
+  query,
+  Parameters = [],
+  Statement = "",
+}: {
+  query: Query;
+  Parameters?: AttributeValue[];
+  Statement?: string;
+}): { Parameters: AttributeValue[]; Statement: string } => {
   if (!_.isPlainObject(query)) return { Parameters, Statement };
 
   _.each(query, (value, key) => {
@@ -268,6 +269,7 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
     if (/^\$(and|or|not)$/i.test(key)) {
       // check $and | $or | $not
       const m = /^\$(and|or|not)$/i.exec(key);
+      if (!m || !m[1]) return;
       Statement += ` ${m[1].toUpperCase()} (`;
       let { Parameters: p, Statement: s } = _prepareParameters({
         query: value,
@@ -288,7 +290,9 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
         if (k === "lt") Statement += `${key} < ?`;
         if (k === "like") Statement += `contains(${key}, ?)`;
 
-        Parameters.push(getAttributeValue(v));
+        const params = getAttributeValue(v) as AttributeValue;
+        if (!params) return;
+        Parameters.push(params);
       });
     } else if (_.isArray(value) && value.length > 0) {
       // check value is array
@@ -296,14 +300,18 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
       Parameters = _.reduce(
         value,
         (prev, v) => {
-          prev.push(getAttributeValue(v));
+          const params = getAttributeValue(v) as AttributeValue;
+          if (!params) return prev;
+          prev.push(params);
           return prev;
         },
-        Parameters
+        Parameters,
       );
     } else if (value) {
       Statement += ` ${key} = ?`;
-      Parameters.push(getAttributeValue(value));
+      const params = getAttributeValue(value) as AttributeValue;
+      if (!params) return;
+      Parameters.push(params);
     }
   });
 
@@ -320,8 +328,19 @@ const _prepareParameters = ({ query, Parameters = [], Statement = "" }) => {
  * @param {PlainObject} query
  * @returns
  */
-const createPartiQL = ({ Table, query = {} }) => {
-  let partiQL = {
+
+export type DBQuery = {
+  limit?: number | string;
+  offset?: string;
+  [key: string]: any;
+};
+
+export type CreatePartiQLProps = {
+  Table: TableDescription;
+  query?: DBQuery;
+};
+export const createPartiQL = ({ Table, query = {} }: CreatePartiQLProps) => {
+  let partiQL: ExecuteStatementCommandInput = {
     Statement: `SELECT * FROM "${Table.TableName}" `,
   };
   const { limit, offset, ...option } = query;
@@ -341,11 +360,4 @@ const createPartiQL = ({ Table, query = {} }) => {
   partiQL["Parameters"] = Parameters;
   partiQL["ReturnConsumedCapacity"] = "TOTAL";
   return partiQL;
-};
-
-module.exports = {
-  getAttributeValue,
-  createItem,
-  createPartiQL,
-  getValue,
 };

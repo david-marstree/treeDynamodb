@@ -4,3 +4,5 @@ tags
 package-lock.json
 tags.temp
 tags.lock
+
+.DS_Store

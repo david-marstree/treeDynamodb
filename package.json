@@ -1,15 +1,13 @@
 {
-    "dependencies": {
-        "@aws-sdk/client-dynamodb": "^3.282.0",
-        "lodash": "^4.17.21"
-    },
     "name": "treedynamodb",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "for tree system to call aws dynamodb ",
-    "main": "index.js",
-    "devdependencies": {},
+    "main": "lib/cjs/index.js",
+    "module": "lib/esm/index.js",
+    "types": "lib/esm/index.d.ts",
     "scripts": {
-        "test": "echo \"error: no test specified\" && exit 1"
+        "test": "echo \"error: no test specified\" && exit 1",
+        "build": "tsc && tsc -p tsconfig-cjs.json"
     },
     "repository": {
         "type": "git",
@@ -25,7 +23,14 @@
         "url": "https://github.com/david-marstree/treedynamodb/issues"
     },
     "homepage": "https://github.com/david-marstree/treedynamodb#readme",
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.282.0",
+        "lodash": "^4.17.21"
+    },
     "devDependencies": {
-        "treeapirequest": "^1.0.6"
+        "@tsconfig/node-lts": "^18.12.3",
+        "@types/lodash": "^4.14.197",
+        "treeapirequest": "^1.0.8",
+        "typescript": "^5.1.6"
     }
 }
