@@ -260,3 +260,13 @@ export const remove = async ({
     console.log(error);
   }
 };
+
+export default {
+  createClient,
+  describeTable,
+  get,
+  getOne,
+  add,
+  remove,
+  edit,
+};

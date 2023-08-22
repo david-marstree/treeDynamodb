@@ -88,5 +88,17 @@ type RemoveProps = {
     data: RemoveData;
 };
 export declare const remove: ({ client, table, data, }: RemoveProps) => Promise<undefined | DeleteItemCommandOutput>;
-export {};
+declare const _default: {
+    createClient: (config: DynamoDBClientConfigType) => DynamoDBClient;
+    describeTable: ({ client, table, }: {
+        client: DynamoDBClient;
+        table: string;
+    }) => Promise<TableDescription | undefined>;
+    get: ({ client, table, query, }: GetProps) => Promise<GetResponse | undefined>;
+    getOne: ({ client, table, query, }: GetOneProps) => Promise<GetOneResponse | undefined>;
+    add: ({ client, table, data, }: AddProps) => Promise<BatchWriteItemCommandOutput | PutItemCommandOutput | undefined>;
+    remove: ({ client, table, data, }: RemoveProps) => Promise<DeleteItemCommandOutput | undefined>;
+    edit: ({ client, table, data, }: AddProps) => Promise<BatchWriteItemCommandOutput | PutItemCommandOutput | undefined>;
+};
+export default _default;
 //# sourceMappingURL=index.d.ts.map
