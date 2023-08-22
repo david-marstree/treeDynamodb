@@ -1,9 +1,10 @@
 {
     "name": "treedynamodb",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "description": "for tree system to call aws dynamodb ",
     "main": "lib/cjs/index.js",
     "module": "lib/esm/index.js",
+    "type": "module",
     "types": "lib/esm/index.d.ts",
     "scripts": {
         "test": "echo \"error: no test specified\" && exit 1",
@@ -32,5 +33,12 @@
         "@types/lodash": "^4.14.197",
         "treeapirequest": "^1.0.8",
         "typescript": "^5.1.6"
+    },
+    "exports": {
+        ".": {
+            "import": "./lib/esm/index.js",
+            "require": "./lib/cjs/index.js"
+        },
+        "./package.json": "./package.json"
     }
 }
