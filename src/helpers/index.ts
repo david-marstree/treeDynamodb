@@ -262,6 +262,7 @@ const _prepareParameters = ({
   if (!_.isPlainObject(query)) return { Parameters, Statement };
 
   _.each(query, (value, key) => {
+    if (typeof value === "undefined") return;
     if (Statement !== "" && !/^\$(and|or|not)$/i.test(key)) {
       Statement += " AND ";
     }
@@ -281,6 +282,7 @@ const _prepareParameters = ({
       // check value is object
       let i = 0;
       _.each(value, (v, k) => {
+        if (typeof v === "undefined") return;
         if (i++ > 0) Statement += " AND ";
         if (k === "eq") Statement += `${key} = ?`;
         if (k === "ne") Statement += `${key} <> ?`;

@@ -9,12 +9,11 @@ const client = treeDynamodb.createClient({
 const func = async () => {
   const response = await treeDynamodb.get({
     client,
-    table: "apiflowProject-dev",
+    table: "buildlinkPage-main",
     query: {
-      limit: 1,
-      NextToken:""
-      //   "BgcG/9uo6ItJjU7yogYUpEIFAXpSTew6rCHUJVF7menp4hKqgv5eHIOxDbprhTRy6lslqcroyVTKU1o6QWm9gqoA3a/4yDbMNxMrKVsa5kjDajvD/zott2wAuoIhLZHH1vJCUmFQhDXHt73FpFhNs8G5u0Ww/HWLAQZ1cjlx1b3SNwrmhmBboj0Be/cT/3RN6KunY7tm0cqrepOCHDGXJjGTrze5O/M7yHfcjTypXsESl23pHJiKF3k4h+gf4o4uI1hbuPybhMP43c87DneejvdaJXvAoP0+ktAgm1/lpU6QsHRj0lhYxdvRa8XoRFjEugaFdDkcx8t3c9XgD+QVBGHWpJrmAVgrNzWpjw==",
-      // offset: "MTY4Nzg3NDAwNDkyNy0wLjky",
+      slug: "home",
+      projectId: "MTY5MzIyNjc0MjkwNi0wLjM4",
+      parentId: undefined,
     },
   });
   console.log(response);
