@@ -1,13 +1,14 @@
 {
     "name": "treedynamodb",
-    "version": "1.0.15",
+    "version": "1.0.17",
     "description": "for tree system to call aws dynamodb ",
     "main": "lib/cjs/index.js",
     "module": "lib/esm/index.js",
     "types": "lib/esm/index.d.ts",
     "scripts": {
         "test": "echo \"error: no test specified\" && exit 1",
-        "build": "tsc && tsc -p tsconfig-cjs.json"
+        "build": "tsc && tsc -p tsconfig-cjs.json",
+        "deploy": "yarn build && npm publish"
     },
     "repository": {
         "type": "git",
