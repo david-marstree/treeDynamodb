@@ -225,7 +225,7 @@ export const createItem = ({ Table, data }: CreateItemProps) => {
       if (af && af.AttributeType) {
         newObj[name] = {};
         if (af.AttributeType === "N") {
-          data[name] = new String(data[name]);
+          data[name] = data[name] + "";
         }
         newObj[name][af.AttributeType] = data[name];
         return {

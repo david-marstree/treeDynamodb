@@ -32,7 +32,7 @@ import type { DBQuery } from "./helpers";
 export const createClient = (
   config: DynamoDBClientConfigType,
 ): DynamoDBClient => {
-  const client = new DynamoDBClient(config);
+  const client = new DynamoDBClient({ ...config });
   return client;
 };
 

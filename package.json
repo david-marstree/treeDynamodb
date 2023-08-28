@@ -1,6 +1,6 @@
 {
     "name": "treedynamodb",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "description": "for tree system to call aws dynamodb ",
     "main": "lib/cjs/index.js",
     "module": "lib/esm/index.js",
