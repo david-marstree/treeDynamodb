@@ -36,7 +36,7 @@ export type CreateItemProps = {
     Table: TableDescription;
     data: any;
 };
-export declare const createItem: ({ Table, data }: CreateItemProps) => {} | undefined;
+export declare const createItem: ({ Table, data }: CreateItemProps) => any;
 export type Query = {
     [key: string]: any;
 };

@@ -1,14 +1,16 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import type { BatchWriteItemCommandOutput, PutItemCommandOutput, DeleteItemCommandOutput } from "@aws-sdk/client-dynamodb";
-import type { DynamoDBClientConfigType, TableDescription } from "@aws-sdk/client-dynamodb";
+import type { BatchWriteItemCommandOutput, PutItemCommandOutput, DeleteItemCommandOutput, DynamoDBClientConfig, TableDescription } from "@aws-sdk/client-dynamodb";
 import type { DBQuery } from "./helpers";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
 /**
  * @name createClient
  * @abstract for connecting the dynamoDB and get DB client
  * @param {*} config
  * @returns
  */
-export declare const createClient: (config: DynamoDBClientConfigType) => DynamoDBClient;
+export declare const createClient: (config: DynamoDBClientConfig) => DynamoDBClient;
+export declare const createDocumentClient: (client: DynamoDBClient, config?: TranslateConfig) => DynamoDBDocumentClient;
 /**
  * @name describeTable
  * @async
@@ -89,7 +91,7 @@ type RemoveProps = {
 };
 export declare const remove: ({ client, table, data, }: RemoveProps) => Promise<undefined | DeleteItemCommandOutput>;
 declare const _default: {
-    createClient: (config: DynamoDBClientConfigType) => DynamoDBClient;
+    createClient: (config: DynamoDBClientConfig) => DynamoDBClient;
     describeTable: ({ client, table, }: {
         client: DynamoDBClient;
         table: string;

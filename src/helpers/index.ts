@@ -199,7 +199,7 @@ export type CreateItemProps = {
 
 export const createItem = ({ Table, data }: CreateItemProps) => {
   const dataNames = _.keys(data);
-  const { KeySchema, AttributeDefinitions } = Table;
+  const { KeySchema } = Table;
   // // check data keys include key or not
   // console.log("KeySchema", KeySchema);
   // console.log("dataNames", dataNames);
@@ -213,37 +213,7 @@ export const createItem = ({ Table, data }: CreateItemProps) => {
     return;
   }
 
-  let item = {};
-  item = _.reduce(
-    dataNames,
-    (prev, name) => {
-      let newObj: any = {};
-      const af = _.find(
-        AttributeDefinitions,
-        (af) => af.AttributeName === name,
-      );
-      if (af && af.AttributeType) {
-        newObj[name] = {};
-        if (af.AttributeType === "N") {
-          data[name] = data[name] + "";
-        }
-        newObj[name][af.AttributeType] = data[name];
-        return {
-          ...prev,
-          ...newObj,
-        };
-      } else {
-        newObj[name] = getAttributeValue(data[name]);
-        return {
-          ...prev,
-          ...newObj,
-        };
-      }
-    },
-    item,
-  );
-
-  return item;
+  return data;
 };
 
 export type Query = {
@@ -292,7 +262,8 @@ const _prepareParameters = ({
         if (k === "lt") Statement += `${key} < ?`;
         if (k === "like") Statement += `contains(${key}, ?)`;
 
-        const params = getAttributeValue(v) as AttributeValue;
+        // const params = getAttributeValue(v) as AttributeValue;
+        const params = v;
         if (!params) return;
         Parameters.push(params);
       });
@@ -302,7 +273,8 @@ const _prepareParameters = ({
       Parameters = _.reduce(
         value,
         (prev, v) => {
-          const params = getAttributeValue(v) as AttributeValue;
+          // const params = getAttributeValue(v) as AttributeValue;
+          const params = v;
           if (!params) return prev;
           prev.push(params);
           return prev;
@@ -311,7 +283,8 @@ const _prepareParameters = ({
       );
     } else if (value) {
       Statement += ` ${key} = ?`;
-      const params = getAttributeValue(value) as AttributeValue;
+      // const params = getAttributeValue(value) as AttributeValue;
+      const params = value;
       if (!params) return;
       Parameters.push(params);
     }

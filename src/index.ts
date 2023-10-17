@@ -1,13 +1,5 @@
 import _ from "lodash";
-import {
-  DynamoDBClient,
-  DescribeTableCommand,
-  GetItemCommand,
-  PutItemCommand,
-  BatchWriteItemCommand,
-  ExecuteStatementCommand,
-  DeleteItemCommand,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
 import type {
   BatchWriteItemCommandOutput,
   BatchWriteItemCommandInput,
@@ -16,12 +8,16 @@ import type {
   DynamoDBClientConfig,
   TableDescription,
 } from "@aws-sdk/client-dynamodb";
-import { createPartiQL, createItem, getValue } from "./helpers";
+import { createPartiQL, createItem } from "./helpers";
 
 import type { DBQuery } from "./helpers";
 import {
+  BatchWriteCommand,
   DynamoDBDocumentClient,
-  ExecuteStatementCommand as DDBDocExecuteStatementCommand,
+  ExecuteStatementCommand,
+  GetCommand,
+  PutCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
 
@@ -38,7 +34,7 @@ export const createClient = (config: DynamoDBClientConfig): DynamoDBClient => {
 
 export const createDocumentClient = (
   client: DynamoDBClient,
-  config?: TranslateConfig
+  config?: TranslateConfig,
 ): DynamoDBDocumentClient => {
   const documentClient = DynamoDBDocumentClient.from(client, config);
   return documentClient;
@@ -100,14 +96,14 @@ export const get = async ({
   if (!Table) return;
   const partiQL = createPartiQL({ Table, query });
   console.log("partiQL", partiQL);
-  const cmd = new DDBDocExecuteStatementCommand(partiQL);
+  const cmd = new ExecuteStatementCommand(partiQL);
 
   try {
     const response = await ddbDocClient.send(cmd);
     const getResponse: GetResponse = {
       ...response,
-      Items: getValue(response.Items),
-      LastEvaluatedKey: getValue(response.LastEvaluatedKey),
+      Items: response.Items,
+      LastEvaluatedKey: response.LastEvaluatedKey,
     };
     return getResponse;
   } catch (error) {
@@ -139,19 +135,20 @@ export const getOne = async ({
   table,
   query,
 }: GetOneProps): Promise<undefined | GetOneResponse> => {
+  const ddbDocClient = createDocumentClient(client);
   const Table = await describeTable({ client, table });
   if (!Table) return;
   const Key = createItem({ Table, data: query });
   if (!!!Key) return;
 
-  const cmd = new GetItemCommand({
+  const cmd = new GetCommand({
     TableName: table,
     Key,
   });
 
   try {
-    const response = await client.send(cmd);
-    let result = { ...response, Item: getValue(response.Item) };
+    const response = await ddbDocClient.send(cmd);
+    let result = { ...response, Item: response.Item };
     return result;
   } catch (error) {
     console.log(error);
@@ -183,6 +180,7 @@ export const add = async ({
 }: AddProps): Promise<
   undefined | BatchWriteItemCommandOutput | PutItemCommandOutput
 > => {
+  const ddbDocClient = createDocumentClient(client);
   const Table = await describeTable({ client, table });
   if (!Table) return;
   console.log("data:", data);
@@ -202,14 +200,14 @@ export const add = async ({
         });
         return prev;
       },
-      []
+      [],
     );
 
-    const cmd = new BatchWriteItemCommand({
+    const cmd = new BatchWriteCommand({
       RequestItems,
     });
     try {
-      const response = await client.send(cmd);
+      const response = await ddbDocClient.send(cmd);
       return response;
     } catch (error) {
       console.log(error);
@@ -218,12 +216,12 @@ export const add = async ({
     const Item = createItem({ Table, data });
     console.log("Item:", Item);
 
-    const cmd = new PutItemCommand({
+    const cmd = new PutCommand({
       TableName: table,
       Item,
     });
     try {
-      const response = await client.send(cmd);
+      const response = await ddbDocClient.send(cmd);
       return response;
     } catch (error) {
       console.log(error);
@@ -253,17 +251,18 @@ export const remove = async ({
   table,
   data,
 }: RemoveProps): Promise<undefined | DeleteItemCommandOutput> => {
+  const ddbDocClient = createDocumentClient(client);
   const Table = await describeTable({ client, table });
   if (!Table) return;
   const Key = createItem({ Table, data });
   if (!!!Key) return;
-  const cmd = new DeleteItemCommand({
+  const cmd = new DeleteCommand({
     TableName: table,
     Key,
   });
 
   try {
-    const response = await client.send(cmd);
+    const response = await ddbDocClient.send(cmd);
     return response;
   } catch (error) {
     console.log(error);

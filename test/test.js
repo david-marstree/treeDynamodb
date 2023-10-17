@@ -7,13 +7,11 @@ const client = treeDynamodb.createClient({
 //const { data } = treeApiRequest.option(require("./test.json"));
 
 const func = async () => {
-  const response = await treeDynamodb.get({
+  const response = await treeDynamodb.getOne({
     client,
-    table: "buildlinkPage-main",
+    table: "buildlinkProject-main",
     query: {
-      slug: "home",
-      projectId: "MTY5MzIyNjc0MjkwNi0wLjM4",
-      parentId: undefined,
+      id: "MTY5MzMwNDIxMTQwOC0wLjgz",
     },
   });
   console.log(response);
