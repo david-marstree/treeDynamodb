@@ -13,15 +13,17 @@ import type {
   BatchWriteItemCommandInput,
   PutItemCommandOutput,
   DeleteItemCommandOutput,
+  DynamoDBClientConfig,
+  TableDescription,
 } from "@aws-sdk/client-dynamodb";
 import { createPartiQL, createItem, getValue } from "./helpers";
 
-import type {
-  DynamoDBClientConfigType,
-  TableDescription,
-} from "@aws-sdk/client-dynamodb";
-
 import type { DBQuery } from "./helpers";
+import {
+  DynamoDBDocumentClient,
+  ExecuteStatementCommand as DDBDocExecuteStatementCommand,
+} from "@aws-sdk/lib-dynamodb";
+import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
 
 /**
  * @name createClient
@@ -29,11 +31,17 @@ import type { DBQuery } from "./helpers";
  * @param {*} config
  * @returns
  */
-export const createClient = (
-  config: DynamoDBClientConfigType,
-): DynamoDBClient => {
+export const createClient = (config: DynamoDBClientConfig): DynamoDBClient => {
   const client = new DynamoDBClient({ ...config });
   return client;
+};
+
+export const createDocumentClient = (
+  client: DynamoDBClient,
+  config?: TranslateConfig
+): DynamoDBDocumentClient => {
+  const documentClient = DynamoDBDocumentClient.from(client, config);
+  return documentClient;
 };
 
 /**
@@ -87,14 +95,15 @@ export const get = async ({
   table,
   query,
 }: GetProps): Promise<undefined | GetResponse> => {
+  const ddbDocClient = createDocumentClient(client);
   const Table = await describeTable({ client, table });
   if (!Table) return;
   const partiQL = createPartiQL({ Table, query });
   console.log("partiQL", partiQL);
-  const cmd = new ExecuteStatementCommand(partiQL);
+  const cmd = new DDBDocExecuteStatementCommand(partiQL);
 
   try {
-    const response = await client.send(cmd);
+    const response = await ddbDocClient.send(cmd);
     const getResponse: GetResponse = {
       ...response,
       Items: getValue(response.Items),
@@ -193,7 +202,7 @@ export const add = async ({
         });
         return prev;
       },
-      [],
+      []
     );
 
     const cmd = new BatchWriteItemCommand({

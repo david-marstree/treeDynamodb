@@ -26,6 +26,7 @@
     "homepage": "https://github.com/david-marstree/treedynamodb#readme",
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.282.0",
+        "@aws-sdk/lib-dynamodb": "^3.429.0",
         "lodash": "^4.17.21"
     },
     "devDependencies": {
